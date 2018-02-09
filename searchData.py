@@ -2,14 +2,14 @@ from openpyxl import load_workbook
 
 def stateToIndex(state):
     stateTable = {"AZ": 0, "CA": 1, "NM": 2, "TX": 3}
-    if state in stateTable
+    if state in stateTable:
         return stateTable[state]
     return -1
     pass
 
 def main():
     wb = load_workbook("ProblemCData.xlsx")
-    sheet = wb.active
+    sheet = wb.worksheets[0]
     table = {}
 
     for r in range(2, sheet.max_row+1):
@@ -32,6 +32,7 @@ def main():
             print(table[msn][state][yr])
         except:
             print("Data not found.")
+        print()
     pass
 
 if __name__ == "__main__":

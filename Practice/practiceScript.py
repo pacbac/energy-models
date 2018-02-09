@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 
 def main():
-    wb = load_workbook("C:/Python36/data.xlsx")
+    wb = load_workbook("data.xlsx")
     sheet = wb.active
     table = {}
     for c in range(4, sheet.max_column):

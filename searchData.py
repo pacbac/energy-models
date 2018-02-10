@@ -1,5 +1,11 @@
 from openpyxl import load_workbook
 
+class states(Enum):
+    AZ = 0
+    CA = 1
+    NM = 2
+    TX = 3
+
 def stateToIndex(state):
     stateTable = {"AZ": 0, "CA": 1, "NM": 2, "TX": 3}
     if state in stateTable:

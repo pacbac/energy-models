@@ -1,11 +1,22 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
 
-def calcSigma(q, k , p, f):
-    return (q*k)/(p*f)
+sigma = {}
+table = {}
+msnTable = {}
+proportions = {}
 
-def calcProportions(q, k, f, sigma):
-    return f/((k**(sigma)*q**(1-sigma)))
+#Parameters in t
+def calcSigma(rConsump, rPrice , tPrice, tConsump):
+    return (rConsump*rPrice)/(tConsump*tPrice)
+
+#Parameters in t except tConsump in t+1, solve for proportion in t
+def calcProportions(nConsump, rConsump, tConsump, sigma):
+    return tConsump/((nConsump**(sigma)*rConsump**(1-sigma)))
+
+#Given parameters in t, calculate consumption for t+1
+def calcConsumption(proportion, nConsump, rConsump, sigma):
+    return proportion*nConsump**(sigma)*rConsump**(1-sigma)
 
 def stateToIndex(state):
     stateTable = {"AZ": 0, "CA": 1, "NM": 2, "TX": 3}
@@ -14,13 +25,35 @@ def stateToIndex(state):
     return -1
     pass
 
-def main():
+def calculate(startYear, maxYear, k, q, p, f):
+    if startYear == maxYear:
+        return f
+
+
+def export(tbl, i):
+    wb2 = Workbook()
+    wb2Sheet = wb2.active
+
+    wb2Sheet.cell(row=1, column=1).value = "Year"
+    wb2Sheet.cell(row=1, column=2).value = "A(Year)"
+
+    r = 2
+    for yr in tbl.keys():
+        wb2Sheet.cell(row=r, column=1).value = yr
+        wb2Sheet.cell(row=r, column=2).value = tbl[yr]
+        r += 1
+    wb2.save("proportion"+str(i)+".xlsx")
+    pass
+
+def load():
     wb1 = load_workbook("ProblemCData.xlsx")
     dataSheet = wb1.worksheets[0]
     msnCodes = wb1.worksheets[1]
-    table = {}
-    msnTable = {}
 
+    global table
+    global msnTable
+    global sigma
+    global proportions
     for r in range(2, dataSheet.max_row+1):
         msn = dataSheet.cell(row=r, column=1).value #col 1
         state = stateToIndex(dataSheet.cell(row=r, column=2).value) #col 2
@@ -38,41 +71,29 @@ def main():
         msnTable[msn] = [desc, unit] #array of [description, unit of msn]
 
     for i in range(0, 4):
-        tc = {yr: table["TETCB"][i][yr] for yr in table["TETCD"][i].keys()}
-        tap = {yr: table["TETCD"][i][yr] for yr in table["TETCD"][i].keys()}
-        nrap = {yr: (table["PATCD"][i][yr]+table["NGTCD"][i][yr])/2 for yr in table["TETCD"][i].keys()}
-        nrc = {yr: (table["PATCB"][i][yr]+table["NGTCB"][i][yr])/2 for yr in table["TETCD"][i].keys()}
-        trc = {yr: table["RETCB"][i][yr] for yr in table["TETCD"][i].keys()}
-        renewableNRGAvgPrice = {yr: float((tc[yr]*tap[yr]-nrc[yr]*nrap[yr])/trc[yr]) for yr in table["TETCD"][i].keys()}
-        sigma = {yr: calcSigma(renewableNRGAvgPrice[yr], trc[yr], tap[yr], tc[yr]) for yr in table["TETCD"][i].keys()}
-        proportions = {}
-        for j in range(1971, 2010):
-            proportions[j-1] = calcProportions(renewableNRGAvgPrice[j-1], trc[j], tc[j-1], sigma[j-1])
+        #total consumption
+        tc = {yr: table["TETCB"][i][yr] for yr in table["GDPRX"][i].keys()}
+        #total average price
+        tap = {yr: table["TETCD"][i][yr] for yr in table["GDPRX"][i].keys()}
+        #total non renewable average price
+        tnrap = {yr: (table["PATCD"][i][yr]+table["NGTCD"][i][yr])/2 for yr in table["GDPRX"][i].keys()}
+        #total non renewable consumption
+        tnrc = {yr: (table["PATCB"][i][yr]+table["NGTCB"][i][yr])/2 for yr in table["GDPRX"][i].keys()}
+        #total renewable consumption
+        trc = {yr: table["RETCB"][i][yr] for yr in table["GDPRX"][i].keys()}
+        #total renewable average price
+        trap = {yr: float((tc[yr]*tap[yr]-tnrc[yr]*tnrap[yr])/trc[yr]) for yr in table["GDPRX"][i].keys()}
 
-        print(proportions)
+        for yr in table["GDPRX"][i].keys():
+            sigma[yr] = calcSigma(trc[yr], trap[yr], tc[yr], tap[yr]) #k, q, p, f
+        for j in range(1978, 2010):
+            proportions[j-1] = calcProportions(tnrc[j-1], trc[j-1], tc[j], sigma[j-1]) #k, q, f, sigma
+            #print(proportions)
 
+        print(calcConsumption(proportion[2009], tnrc[2009], trc[2009], sigma[2009])-calcConsumption(proportion[2008], tnrc[2008], trc[2008], sigma[2008]))
 
-        wb2 = Workbook()
-        wb2Sheet = wb2.active
-
-        wb2Sheet.cell(row=1, column=1).value = "Year"
-        wb2Sheet.cell(row=1, column=2).value = "A(year)"
-
-        r = 2
-        for yr in proportions.keys():
-            #if key[2:5] == "TCB" and key != "LOTCB" and key != "WYTCB":
-            #if key == "RFTCB" or key == "RETCB" or key =="POTCB" or key == "NGTCB" or key == "MMTCB" or key == "LGTCB" or key == "JFTCB" or key == "HYTCB" or key == "CLTCB" or key == "BMTCB":
-            #if key == "RFICB" or key == "POICB" or key == "NGICB" or key == "LGICB" or key == "HYICB" or key == "CLICB":
-                #print(key)
-            wb2Sheet.cell(row=r, column=1).value = yr
-            wb2Sheet.cell(row=r, column=2).value = proportions[yr]
-            #wb2Sheet.cell(row=r, column=3).value = msnTable["TETCD"][0].replace(".", "")
-            #wb2Sheet.cell(row=r, column=4).value = wb2Sheet.cell(row=r, column=4).value.replace(" total consumption", "")
-            #wb2Sheet.cell(row=r, column=4).value = wb2Sheet.cell(row=r, column=4).value.replace(" total production", "")
-            r += 1
-        wb2.save("proportion"+str(i)+".xlsx")
-
+        if __name__ == "__main__":
+            export(proportions, i)
     pass
 
-if __name__ == "__main__":
-    main()
+load()

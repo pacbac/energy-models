@@ -8,12 +8,27 @@ def stateToIndex(state):
     return -1
     pass
 
+def indexToState(index):
+    stateTable = {0: "AZ", 1: "CA", 2: "NM", 3: "TX"}
+    if index in stateTable:
+        return stateTable[index]
+    return -1
+    pass
+
+
 def main():
     wb1 = load_workbook("ProblemCData.xlsx")
+    wb3 = load_workbook("CPIAZ.xlsx")
+    cpiSheet = wb3.active
+
     dataSheet = wb1.worksheets[0]
     msnCodes = wb1.worksheets[1]
     table = {}
     msnTable = {}
+    GDPRatioTable = [{}, {}, {}, {}]
+    inflationTable = [{}, {}, {}, {}]
+    AZTable = {}
+    AZTablePrevious = {}
 
     for r in range(2, dataSheet.max_row+1):
         msn = dataSheet.cell(row=r, column=1).value #col 1
@@ -31,29 +46,54 @@ def main():
         #print(desc)
         msnTable[msn] = [desc, unit] #array of [description, unit of msn]
 
+    for r in range(1, cpiSheet.max_row+1):
+        AZTable[1996+r] = cpiSheet.cell(row=r, column=3).value
+
+    for state in range(0, 4):
+        for yr in table["GDPRX"][state].keys():
+            GDPRatioTable[state][yr] = float(table["GDPRV"][state][yr]/table["GDPRX"][state][yr])
+        for yr in range(1978, 2010):
+            inflationTable[state][yr] = float((GDPRatioTable[state][yr]-GDPRatioTable[state][yr-1])/GDPRatioTable[state][yr-1])
     wb2 = Workbook()
     wb2Sheet = wb2.active
+    print(inflationTable[0][1997])
+    print(inflationTable[0][1996])
 
-    wb2Sheet.cell(row=1, column=1).value = "MSN"
-    wb2Sheet.cell(row=1, column=2).value = "Year"
-    wb2Sheet.cell(row=1, column=3).value = "Data"
-    wb2Sheet.cell(row=1, column=4).value = "Description"
-    """Find corresponding keys in the sheet"""
+    #print(inflationTable[0])
+    #wb2Sheet.cell(row=1, column=1).value = "MSN"
+    #wb2Sheet.cell(row=1, column=4).value = "Description"
+
+    wb2Sheet.cell(row=1, column=1).value = "Year"
+    wb2Sheet.cell(row=1, column=2).value = "CPI"
+
+    yr = 1997
     r = 2
-    for key in table.keys():
-        #if key[2:5] == "TCB" and key != "LOTCB" and key != "WYTCB":
-        if key == "RFTCB" or key == "RETCB" or key =="POTCB" or key == "NGTCB" or key == "MMTCB" or key == "LGTCB" or key == "JFTCB" or key == "HYTCB" or key == "CLTCB" or key == "BMTCB":
-        #if key == "RFICB" or key == "POICB" or key == "NGICB" or key == "LGICB" or key == "HYICB" or key == "CLICB":
-            #print(key)
-            for yr in table[key][3]:
-                wb2Sheet.cell(row=r, column=1).value = key
-                wb2Sheet.cell(row=r, column=2).value = yr
-                wb2Sheet.cell(row=r, column=3).value = table[key][3][yr]
-                wb2Sheet.cell(row=r, column=4).value = msnTable[key][0].replace(".", "")
-                wb2Sheet.cell(row=r, column=4).value = wb2Sheet.cell(row=r, column=4).value.replace(" total consumption", "")
-                wb2Sheet.cell(row=r, column=4).value = wb2Sheet.cell(row=r, column=4).value.replace(" total production", "")
-                r += 1
-    wb2.save("totalConsumptionTX.xlsx")
+    inflationIndex = float((GDPRatioTable[0][yr] - GDPRatioTable[0][yr-1])/GDPRatioTable[0][yr-1])
+    cpiPrev = AZTable[yr]/(1+inflationIndex)
+    print(inflationIndex, cpiPrev)
+    while yr > 1978:
+        wb2Sheet.cell(row=r, column=1).value = yr-1
+        wb2Sheet.cell(row=r, column=2).value = cpiPrev
+        yr -= 1
+        inflationIndex = float((GDPRatioTable[0][yr] - GDPRatioTable[0][yr-1])/GDPRatioTable[0][yr-1])
+        cpiPrev = cpiPrev/(1+inflationIndex)
+        r += 1
+
+    wb2.save("cpiConsumption"+indexToState(0)+".xlsx")
+
+    #gdprx = {}
+
+    """for state in range(0, 4):
+        wb2Sheet.cell(row=1, column=1).value = "Year"
+        wb2Sheet.cell(row=1, column=2).value = "Inflation"
+        r = 2
+        for yr in range(1978, 2010):
+            #gdprx[yr] = table["GDPRX"][state][yr]
+            wb2Sheet.cell(row=r, column=1).value = yr
+            wb2Sheet.cell(row=r, column=2).value = inflationTable[state][yr]
+            #wb2Sheet.cell(row=r, column=3).value = table["TETCB"][state][yr]
+            r+=1
+        wb2.save("inflation"+indexToState(state)+".xlsx")"""
     pass
 
 if __name__ == "__main__":

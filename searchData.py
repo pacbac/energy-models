@@ -1,11 +1,5 @@
 from openpyxl import load_workbook
-
-def stateToIndex(state):
-    stateTable = {"AZ": 0, "CA": 1, "NM": 2, "TX": 3}
-    if state in stateTable:
-        return stateTable[state]
-    return -1
-    pass
+from globalFuncs import *
 
 def main():
     wb = load_workbook("ProblemCData.xlsx")

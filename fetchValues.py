@@ -1,20 +1,6 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
-
-def stateToIndex(state):
-    stateTable = {"AZ": 0, "CA": 1, "NM": 2, "TX": 3}
-    if state in stateTable:
-        return stateTable[state]
-    return -1
-    pass
-
-def indexToState(index):
-    stateTable = {0: "AZ", 1: "CA", 2: "NM", 3: "TX"}
-    if index in stateTable:
-        return stateTable[index]
-    return -1
-    pass
-
+from globalFuncs import *
 
 def main():
     wb1 = load_workbook("ProblemCData.xlsx")
@@ -28,7 +14,6 @@ def main():
     GDPRatioTable = [{}, {}, {}, {}]
     inflationTable = [{}, {}, {}, {}]
     AZTable = {}
-    AZTablePrevious = {}
 
     for r in range(2, dataSheet.max_row+1):
         msn = dataSheet.cell(row=r, column=1).value #col 1
@@ -56,8 +41,8 @@ def main():
             inflationTable[state][yr] = float((GDPRatioTable[state][yr]-GDPRatioTable[state][yr-1])/GDPRatioTable[state][yr-1])
     wb2 = Workbook()
     wb2Sheet = wb2.active
-    print(inflationTable[0][1997])
-    print(inflationTable[0][1996])
+    #print(inflationTable[0][1997])
+    #print(inflationTable[0][1996])
 
     #print(inflationTable[0])
     #wb2Sheet.cell(row=1, column=1).value = "MSN"

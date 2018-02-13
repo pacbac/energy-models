@@ -1,5 +1,5 @@
 from openpyxl import load_workbook
-from globalFuncs import *
+from globalFuncs impor
 
 def main():
     wb = load_workbook("ProblemCData.xlsx")

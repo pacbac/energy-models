@@ -1,32 +1,31 @@
 import math
 
 def calcProportion(yr, state):
-    stateTable = {0: calcProportionAZ, 1: calcProportionCA, 2: calcProportionNM, 3: calcProportionTX}
-    return stateTable[state](yr)
-
-def calcProportionTX(yr):
-    #return yr/1000
-    return 77.49*math.sin(0.09199*yr-17.88)+70.81*math.sin(0.09832*yr+136.1)
-
-def calcProportionNM(yr):
-    return 62.72*math.sin(0.07689*yr+12.56)+56.69*math.sin(0.0808*yr+165.3)
-
-def calcProportionCA(yr):
-    return 769*math.sin(0.0006886*yr+163.6)+0.08925*math.sin(0.2558*yr-178.5)
-
-def calcProportionAZ(yr):
-    return 85.58*math.sin(0.05192*yr+62.53)+82.07*math.sin(0.05366*yr+225.6)
-
-def calcTotalAvgPrice(yr, state):
-    stateTable = {0: [82.65, 0.1166, -36.49, 71.56, 0.1319, 130.9], 1: [57.62, 0.1181, -39.53, 48.25, 0.14, 114.9], 2: [67.13, 0.1166, -36.66, 58.02, 0.1343, 126], 3: [54.22, 0.1187, -40.7, 47.73, 0.1384, 118]}
-    consts = stateTable[state]
-    return consts[0]*math.sin(consts[1]*yr+consts[2]) + consts[3]*math.sin(consts[4]*yr+consts[5])
-    #return (3.803*10**-30)*math.exp(0.0352*yr)
-    #return (1.453*10**-35)*math.exp(0.0414*yr)
-    #return (1.491*10**-33)*math.exp(0.03906*yr)
+    if state == 0:
+        return (5.895*yr**3-1.152*10**4*yr**2-11.6*yr+0.3257)/(yr**3-1942*yr**2-9.761*yr+0.4143)
+    elif state == 1:
+        return (3.792*yr**2+0.1939*yr+0.01028)/(yr**2+0.057*yr+0.002798)
+    elif state == 2:
+        return (0.1602*yr**2+184*yr+0.7188)/(yr**2-1908*yr-0.6452)
+    return (2.073*10**7)*math.exp(-0.007473*yr)
 
 def calcNonRenewableAvgPrice(yr, state):
-    stateTable = {0: [42.28, 0.1191, -41.53, 35.89, 0.1405, 113.8], 1: [36.39, 0.1162, -35.7, 30.42, 0.1412, 112.4], 2: [42.53, 0.1196, -42.45, 36.76, 0.1407, 113.3], 3: [32.04, 0.1153, -34.01, 27.55, 0.1394, 115.8]}
-    consts = stateTable[state]
-    return consts[0]*math.sin(consts[1]*yr+consts[2]) + consts[3]*math.sin(consts[4]*yr+consts[5])
-    #return (1.713*10**-35)*math.exp(0.04114*yr)
+    if state == 0:
+        return (54.16*yr**3-(1.066*10**5)*yr**2-104.5*yr+0.5053)/(yr**3-1817*yr**2+1201*yr+1.932)
+    elif state == 1:
+        return (75.46*yr**3-(1.485*10**5)*yr**2-145.4*yr+0.2596)/(yr**3-1745*yr**2+2316*yr+2.907)
+    elif state == 2:
+        return (73.25*yr**3-(1.442*10**5)*yr**2-140.6*yr+0.3808)/(yr**3-1747*yr**2+2181*yr+2.274)
+    return (79.01*yr**3-(1.556*10**5)*yr**2-150.7*yr+0.3015)/(yr**3-1674*yr**2+2503*yr+3.245)
+
+def calcRenewableAvgPrice(yr, state):
+    if state == 0:
+        return (782.1*yr**3-1.545*10**6*yr**2-1529*yr-1.098)/(yr**3-1972*yr**2+(2.569*10**5)*yr+257.3)
+    elif state == 1:
+        return (201.1*yr**3-3.963*10**5*yr**2-395.8*yr+0.1043)/(yr**3-1925*yr**2+1.401*10**4*yr+14.2)
+    elif state == 2:
+        return (790.9*yr**3-1.561*10**6*yr**2-1567*yr-0.9296)/(yr**3-2051*yr**2+2.179*10**5*yr+219.2)
+    return (1045*yr**3-2.052*10**6*yr**2-2048*yr-1.434)/(yr**3-2113*yr**2+4.43*10**5*yr+443)
+
+def calcPTotal(yr, state, bigQ, F):
+    return calcRenewableAvgPrice(yr, state)*(bigQ/F)+calcNonRenewableAvgPrice(yr, state)*(1-(bigQ/F))

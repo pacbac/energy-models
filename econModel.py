@@ -24,10 +24,6 @@ def calcKnownProportions(nConsump, rConsump, tConsump, sigma):
 def calcConsumption(proportion, nConsump, rConsump, sigma):
     return proportion*nConsump**(sigma)*rConsump**(1-sigma)
 
-def calculate(startYear, maxYear, k, q, p, f):
-    if startYear == maxYear:
-        return f
-
 
 def export(tbl, i):
     wb2 = Workbook()
@@ -41,7 +37,7 @@ def export(tbl, i):
         wb2Sheet.cell(row=r, column=1).value = yr
         wb2Sheet.cell(row=r, column=2).value = tbl[yr]
         r += 1
-    wb2.save("totalAvgRenewablePrice"+indexToState(i)+".xlsx")
+    wb2.save("totalAvgPrice"+indexToState(i)+".xlsx")
     pass
 
 def load():
@@ -98,7 +94,7 @@ def load():
         print("tc", tc[2006])"""
 
         if __name__ == "__main__":
-            export(trap, i)
+            export(tap, i)
     pass
 
 load()

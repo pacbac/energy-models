@@ -19,3 +19,8 @@ Each Python file contributes to the overall project in some way, though not all 
 
 ## Running the model
 Run ``` python competeResources.py ``` in terminal, and it will output energy consumption for every year, separated by state.
+
+## Authors
+- **Clayton Chu** ([pacbac](github.com/pacbac)) - *Creation, Python implementation, and fine-tuning of the model*
+- **Jerry Yin** - *Creation of the model, finding functions of best fit for data*
+- **Zhenxiao Chen** - *Creation of the model, data analysis, finding functions of best fit for data*

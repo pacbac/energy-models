@@ -22,5 +22,5 @@ Run ``` python competeResources.py ``` in terminal, and it will output energy co
 
 ## Authors
 - **Clayton Chu** ([pacbac](github.com/pacbac)) - *Creation, Python implementation, and fine-tuning of the model*
-- **Jerry Yin** - *Creation of the model, finding functions of best fit for data*
+- **Jerry Yin** - *Creation of the model, finding functions of best fit for data, writing most of the paper*
 - **Zhenxiao Chen** - *Creation of the model, data analysis, finding functions of best fit for data*

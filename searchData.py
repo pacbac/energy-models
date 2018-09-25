@@ -17,11 +17,8 @@ def main():
 
     while(True):
         msn = input("Enter MSN: ")
-        #print(type(msn))
         state = stateToIndex(input("Enter state: "))
-        #print(type(state))
         yr = int(input("Enter yr: "))
-        #print(type(yr))
         try:
             print(table[msn][state][yr])
         except:

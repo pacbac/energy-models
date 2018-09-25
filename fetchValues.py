@@ -28,7 +28,6 @@ def main():
         msn = msnCodes.cell(row=r, column=1).value
         desc = msnCodes.cell(row=r, column=2).value
         unit = msnCodes.cell(row=r, column=3).value
-        #print(desc)
         msnTable[msn] = [desc, unit] #array of [description, unit of msn]
 
     for r in range(1, cpiSheet.max_row+1):
@@ -41,12 +40,6 @@ def main():
             inflationTable[state][yr] = float((GDPRatioTable[state][yr]-GDPRatioTable[state][yr-1])/GDPRatioTable[state][yr-1])
     wb2 = Workbook()
     wb2Sheet = wb2.active
-    #print(inflationTable[0][1997])
-    #print(inflationTable[0][1996])
-
-    #print(inflationTable[0])
-    #wb2Sheet.cell(row=1, column=1).value = "MSN"
-    #wb2Sheet.cell(row=1, column=4).value = "Description"
 
     wb2Sheet.cell(row=1, column=1).value = "Year"
     wb2Sheet.cell(row=1, column=2).value = "CPI"
@@ -65,20 +58,6 @@ def main():
         r += 1
 
     wb2.save("cpiConsumption"+indexToState(0)+".xlsx")
-
-    #gdprx = {}
-
-    """for state in range(0, 4):
-        wb2Sheet.cell(row=1, column=1).value = "Year"
-        wb2Sheet.cell(row=1, column=2).value = "Inflation"
-        r = 2
-        for yr in range(1978, 2010):
-            #gdprx[yr] = table["GDPRX"][state][yr]
-            wb2Sheet.cell(row=r, column=1).value = yr
-            wb2Sheet.cell(row=r, column=2).value = inflationTable[state][yr]
-            #wb2Sheet.cell(row=r, column=3).value = table["TETCB"][state][yr]
-            r+=1
-        wb2.save("inflation"+indexToState(state)+".xlsx")"""
     pass
 
 if __name__ == "__main__":

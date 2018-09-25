@@ -62,7 +62,6 @@ def load():
         msn = msnCodes.cell(row=r, column=1).value
         desc = msnCodes.cell(row=r, column=2).value
         unit = msnCodes.cell(row=r, column=3).value
-        #print(desc)
         msnTable[msn] = [desc, unit] #array of [description, unit of msn]
 
     for i in range(0, 4):
@@ -83,15 +82,6 @@ def load():
             sigma[yr] = calcSigma(trc[yr], trap[yr], tc[yr], tap[yr]) #k, q, p, f
         for j in range(1978, 2010):
             proportions[j-1] = calcKnownProportions(tnrc[j-1], trc[j-1], tc[j], sigma[j-1]) #k, q, f, sigma
-            #print(proportions)
-
-        #print(calcConsumption(proportions[2009], tnrc[2009], trc[2009], sigma[2009])-calcConsumption(proportions[2008], tnrc[2008], trc[2008], sigma[2008]))
-
-        """print("trc", trc[2006])
-        print("tnrc", tnrc[2006])
-        print(proportions[2006])
-        print(sigma[2006])
-        print("tc", tc[2006])"""
 
         if __name__ == "__main__":
             export(tap, i)

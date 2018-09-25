@@ -34,7 +34,6 @@ def load():
         for i in otherRenewableKeys:
             sumOtherRenewables += table[i][stateNum][yr]
         competeDict["ORETCB"][yr] = sumOtherRenewables
-    #print(competeDict["ORETCB"])
 
 
 def calcF(bigA, k, bigQ, sigma): #calc renewable & nonRenewable from NList
@@ -45,7 +44,6 @@ def combine(yr, state, NList, currentF, sigma):
     bigQ = 0
     smallq = calcRenewableAvgPrice(yr, state)
     bigA = calcProportion(yr, state)
-    #print("bigA", str(bigA))
     for key in NList:
         if key in ourKeys and ourKeys[key]:
             bigQ += NList[key].y
@@ -53,29 +51,20 @@ def combine(yr, state, NList, currentF, sigma):
             k += NList[key].y
         else:
             bigQ += NList[key].y
-    #print("bigQ", str(bigQ))
     p = calcPTotal(yr, state, bigQ, currentF)
-    #print("sigma1", str(sigma))
-    #k = currentF - bigQ
-    #print("k", str(k))
     if yr == 2025 or yr == 2050:
         print("yr", yr)
         print("smallq", str(smallq))
         print("p", str(p))
     sigma = calcSigma(bigQ, smallq, p, currentF)
-    #print("sigma2", str(sigma))
     nextF = calcF(bigA, k, bigQ, sigma)
-    #print("nextF", nextF)
     coordList = {key: Coord(yr, NList[key].y) for key in NList.keys()}
     return [nextF, coordList]
 
 def splitToNList(yr, endYr, prevF, currentF, coordList, state, prevNList, sigma):
     global r
-    #print("F", yr, currentF)
     NList = {key: approx(0, 1, coordList[key], 1, yr, prevF, key, prevNList, sigma) for key in prevNList.keys()} #set up N(t = start)
-    #print("NList")
     for key in NList:
-        #print(key, NList[key].y)
         if key != "ORETCB":
             sheet.cell(row=r, column=5).value = msnTable[key][0].replace("total consumption", "")
         else:
@@ -126,18 +115,10 @@ def main():
         currentTConsump = table["TETCB"][state][startYear]
         print("currentTConsump", currentTConsump)
         newList = predict(startYear, NList, currentTConsump, endYear, state)
-    #print(avgApproxX, approx(0, 1, Coord(avgApproxX, table["BMTCB"][0][avgApproxX]), 1, avgApproxX).y)
         print("NEWLIST KEYS:")
         for key in newList.keys():
             print(key, newList[key].y)
         stateNum += 1
-
-
-    #wb.save("PriceData.xlsx")
-    #avgApproxY += 0.04*(approx(2, 3, Coord(1974, table["BMTCB"][0][1974]), 1, 1974).y)
-
-
-    #print(avgApproxX, avgApproxY)
     pass
 
 load()
